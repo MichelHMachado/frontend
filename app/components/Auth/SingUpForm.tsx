@@ -15,6 +15,7 @@ type SignUpValues = TypeOf<typeof SignUpSchema>;
 const SignUpForm = () => {
   const router = useRouter();
   const isAuthenticated = useAuth();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -36,8 +37,6 @@ const SignUpForm = () => {
     },
   });
 
-  const [error, setError] = useState<string | null>(null);
-
   const onSubmit = async (data: SignUpValues) => {
     setError(null);
 
@@ -45,11 +44,10 @@ const SignUpForm = () => {
     formData.append("name", data.name);
     formData.append("email", data.email);
     formData.append("password", data.password);
-    console.log("formData on submit: ", formData);
 
     try {
-      const response = await signup(formData);
-      console.log("User created successfully:", response);
+      await signup(formData);
+
       router.push("/");
     } catch (err) {
       if (err?.status === 409) {

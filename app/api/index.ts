@@ -1,7 +1,6 @@
 import axios from "axios";
 import * as dotenv from "dotenv";
 dotenv.config();
-console.log("process.env.BASE_URL: ", process.env.NEXT_PUBLIC_BASE_URL);
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,

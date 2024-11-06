@@ -1,4 +1,3 @@
-// hooks/useAuth.ts
 import { useEffect, useState } from "react";
 import api from "@/app/api";
 import { useRouter } from "next/navigation";
@@ -27,7 +26,7 @@ const useAuth = () => {
         }
       } catch (err) {
         console.error(err);
-        setIsAuthenticated(false); // On error, set to false for redirect
+        setIsAuthenticated(false);
       }
     };
 

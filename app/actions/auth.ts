@@ -16,14 +16,13 @@ export async function signup(formData: FormData) {
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
-  console.log("validatedFields.data: ", validatedFields.data);
+
   try {
     const response = await api.post(`/auth/sign-up`, validatedFields.data);
-    console.log("response.data: ", response.data);
+
     const { access_token } = response.data;
     localStorage.setItem("access_token", access_token);
   } catch (error) {
-    console.log("error: ", error);
     if (error.status === 409) {
       throw { message: "User already exists, try to sign in", status: 409 };
     }
@@ -42,10 +41,10 @@ export async function login(formData: FormData) {
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
-  console.log("validatedFields.data: ", validatedFields.data);
+
   try {
     const response = await api.post(`/auth/login`, validatedFields.data);
-    console.log("response.data: ", response.data);
+
     const { access_token } = response.data;
     localStorage.setItem("access_token", access_token);
   } catch (error) {
@@ -58,8 +57,8 @@ export async function login(formData: FormData) {
 
 export async function logout() {
   try {
-    const response = await api.post(`/auth/logout`);
-    console.log("response.data: ", response.data);
+    await api.post(`/auth/logout`);
+
     localStorage.removeItem("access_token");
   } catch (error) {
     return NextResponse.json(

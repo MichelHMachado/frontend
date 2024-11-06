@@ -42,10 +42,10 @@ const LoginForm = () => {
     const formData = new FormData();
     formData.append("email", data.email);
     formData.append("password", data.password);
-    console.log("formData on submit: ", formData);
+
     try {
       const response = await login(formData);
-      console.log("User logged successfully:", response);
+
       router.push("/");
     } catch (err) {
       setError(err.response?.data?.error || "Failed to login");
