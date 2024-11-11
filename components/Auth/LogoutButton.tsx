@@ -1,7 +1,8 @@
 "use client";
-import { logout } from "@/app/actions/auth";
+import { logout } from "@/lib/actions/auth";
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 import React from "react";
 
@@ -12,7 +13,11 @@ const LogoutButton = () => {
     await logout();
     router.push("/sign-in");
   };
-  return <Button onClick={handleLogout}>Logout</Button>;
+  return (
+    <Button sx={{ color: "white" }} onClick={handleLogout}>
+      <LogoutIcon color="info" />
+    </Button>
+  );
 };
 
 export default LogoutButton;

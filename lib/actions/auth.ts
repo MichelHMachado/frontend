@@ -1,16 +1,14 @@
-import { LoginSchema, SignUpSchema } from "@/app/lib/definitions";
+import { LoginSchema, SignUpSchema } from "@/lib/definitions";
 import api from "../api";
 import { NextResponse } from "next/server";
 
 export async function signup(formData: FormData) {
-  // Validate form fields
   const validatedFields = SignUpSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
   });
 
-  // If any form fields are invalid, return early
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
@@ -21,7 +19,7 @@ export async function signup(formData: FormData) {
     const response = await api.post(`/auth/sign-up`, validatedFields.data);
 
     const { access_token } = response.data;
-    localStorage.setItem("access_token", access_token);
+    sessionStorage.setItem("access_token", access_token);
   } catch (error) {
     if (error.status === 409) {
       throw { message: "User already exists, try to sign in", status: 409 };
@@ -46,7 +44,7 @@ export async function login(formData: FormData) {
     const response = await api.post(`/auth/login`, validatedFields.data);
 
     const { access_token } = response.data;
-    localStorage.setItem("access_token", access_token);
+    sessionStorage.setItem("access_token", access_token);
   } catch (error) {
     return NextResponse.json(
       { error: `Login failed, ${error}` },
@@ -57,9 +55,10 @@ export async function login(formData: FormData) {
 
 export async function logout() {
   try {
-    await api.post(`/auth/logout`);
-
-    localStorage.removeItem("access_token");
+    await api.delete(`/auth/logout`);
+    sessionStorage.removeItem("access_token");
+    document.cookie =
+      "refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
   } catch (error) {
     return NextResponse.json(
       { error: `Login failed, ${error}` },

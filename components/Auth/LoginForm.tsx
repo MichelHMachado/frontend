@@ -5,73 +5,54 @@ import { TypeOf } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button, CircularProgress, TextField, Typography } from "@mui/material";
-import { SignUpSchema } from "@/app/lib/definitions";
-import { signup } from "@/app/actions/auth";
+import { LoginSchema } from "@/lib/definitions";
+import { login } from "@/lib/actions/auth";
 import { useRouter } from "next/navigation";
-import useAuth from "@/app/hooks/useAuth";
+import useAuth from "@/hooks/useAuth";
 
-type SignUpValues = TypeOf<typeof SignUpSchema>;
+type LoginFormValues = TypeOf<typeof LoginSchema>;
 
-const SignUpForm = () => {
+const LoginForm = () => {
   const router = useRouter();
-  const isAuthenticated = useAuth();
-  const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/"); // Navigate after component has mounted and authenticated
-    }
-  }, [isAuthenticated, router]);
+  if (isAuthenticated) {
+    router.push("/"); // Navigate after component has mounted and authenticated
+  }
 
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors, isSubmitting },
-  } = useForm<SignUpValues>({
-    resolver: zodResolver(SignUpSchema),
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
       password: "",
-      name: "",
     },
   });
 
-  const onSubmit = async (data: SignUpValues) => {
+  const [error, setError] = useState<string | null>(null);
+
+  const onSubmit = async (data: LoginFormValues) => {
     setError(null);
 
     const formData = new FormData();
-    formData.append("name", data.name);
     formData.append("email", data.email);
     formData.append("password", data.password);
 
     try {
-      await signup(formData);
+      const response = await login(formData);
 
       router.push("/");
     } catch (err) {
-      if (err?.status === 409) {
-        setError(err?.message);
-        reset();
-      } else {
-        setError(err?.message || "Failed to sign up");
-      }
+      setError(err.response?.data?.error || "Failed to login");
     }
   };
 
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
       {error && <Typography color="error">{error}</Typography>}
-
-      <TextField
-        {...register("name")}
-        label="Name"
-        fullWidth
-        variant="outlined"
-        error={Boolean(errors.name)}
-        helperText={errors.name ? errors.name.message : ""}
-      />
-
       <TextField
         {...register("email")}
         label="Email"
@@ -101,20 +82,19 @@ const SignUpForm = () => {
         disabled={isSubmitting}
         className="mt-4 py-2"
       >
-        {isSubmitting ? <CircularProgress size={24} /> : "Sign Up"}
+        {isSubmitting ? <CircularProgress size={24} /> : "Login"}
       </Button>
-
       <Button
-        onClick={() => router.push("/sign-in")} // Navigate to the sign-in page
+        onClick={() => router.push("/sign-up")} // Navigate to the sign-up page
         variant="text"
         color="primary"
         fullWidth
         className="mt-2"
       >
-        Already have an account? Sign In
+        Don&apos;t have an account? Sign Up
       </Button>
     </form>
   );
 };
 
-export default SignUpForm;
+export default LoginForm;
