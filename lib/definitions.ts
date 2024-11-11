@@ -25,3 +25,23 @@ export const LoginSchema = z.object({
     .email({ message: "Invalid email" }),
   password: z.string().min(8, { message: "Be at least 8 characters long" }),
 });
+
+export const TransactionSchema = z.object({
+  type: z.string().min(1, { message: "Type is required" }),
+  category: z.string().min(1, { message: "Category is required" }),
+  amount: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/, "Amount must be a valid number")
+    .min(1, { message: "Amount is required" }),
+  date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Date is invalid",
+  }),
+});
+
+export const CategorySchema = z.object({
+  uuid: z.string().optional(),
+  name: z.string().min(1, { message: "Name is required" }),
+  userUuid: z.string().uuid({ message: "Invalid user UUID" }),
+});
+
+export type CategoryType = z.infer<typeof CategorySchema>;
